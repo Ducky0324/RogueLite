@@ -1,6 +1,7 @@
 #pragma once
 #include "vec.hpp"
 #include <vector>
+#include <stdio.h>
 
 template <typename T> class Array2D {
 

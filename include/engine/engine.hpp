@@ -1,8 +1,11 @@
 #pragma once
+#include "stage/dungeon.hpp"
+#include "stage/stage.hpp"
 #include "ui/animatedSprite.hpp"
-#include "ui/sprite.hpp"
-#include "ui/spritesheet.hpp"
+#include "ui/tileRenderer.hpp"
+#include "util/rect.hpp"
 #include <SDL2/SDL.h>
+#include <vector>
 
 class GameEngine {
 public:
@@ -16,14 +19,15 @@ private:
   int screenHeight;
   bool running = true;
 
+  TileRenderer tileRender = TileRenderer();
+  Stage testStage = Stage(10, 10);
+  Dungeon dungeonGen = Dungeon(&testStage);
+
   SDL_Window *window = nullptr;
   SDL_Renderer *renderer = nullptr;
   SDL_Event evt;
 
-  SpriteSheet testSheet = SpriteSheet("res/img/tiny_dungeon_world.png");
-  SpriteSheet actorSheet = SpriteSheet("res/img/tiny_dungeon_monsters.png");
-  Sprite testSprite = Sprite(testSheet, 0, 0);
-  AnimatedSprite testAnimatedSprite = AnimatedSprite(actorSheet, 0, 16);
+  std::vector<Rect *> tileRects;
 
   void handleEvents();
   void update();

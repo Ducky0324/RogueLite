@@ -20,6 +20,11 @@ inline int range(int min, int max) {
 
 inline bool oneIn(int chance) { return range(0, chance) == 1; }
 
+template <typename T> inline T item(const std::vector<T> &items) {
+  int index = range(0, items.size());
+  return items[index];
+}
+
 template <typename T> inline T popRand(std::vector<T> &items) {
   int index = range(0, items.size());
   T item = items[index];

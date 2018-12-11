@@ -9,6 +9,7 @@ public:
   int textureVal;
 
   TileType &getType();
+  void printTileInfo();
 
 private:
   TileType type;

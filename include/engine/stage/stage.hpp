@@ -10,20 +10,22 @@ public:
   Stage(int width, int height);
   ~Stage();
 
+  int width;
+  int height;
+  void fill(const TileType &type);
   void setTile(const Vec &pos, const TileType &type);
   TileType *getTile(const Vec &pos);
 
   void setInteractable(const Vec &pos, const TileType &type);
-  TileType *getInteractable(const Vec &pos);
+  Tile *getInteractable(const Vec &pos);
 
-  std::array<TileType *, 8> getNeighbors(const Vec &pos);
+  std::array<TileType *, 8> getNeighboringWalls(const Vec &pos);
+  std::array<TileType *, 8> getNeighboringFloors(const Vec &pos);
 
   Tile *operator[](const Vec &pos);
+  Tile *get(const Vec &pos);
 
 private:
-  int width;
-  int height;
-
   Array2D<Tile *> interactables;
   Array2D<Tile *> tiles;
 };

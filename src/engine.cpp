@@ -1,4 +1,5 @@
 #include "engine/engine.hpp"
+#include "engine/stage/tiles.hpp"
 
 GameEngine::GameEngine(int pscreenWidth, int pscreenHeight)
     : screenWidth(pscreenWidth), screenHeight(pscreenHeight) {
@@ -6,6 +7,17 @@ GameEngine::GameEngine(int pscreenWidth, int pscreenHeight)
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
   if (!window || !renderer) {
     printf("Failed to initialize renderer or window. Error: %s\n", SDL_GetError());
+  }
+
+  testStage =
+      Stage((int)(screenHeight / constants::TILE_SIZE), (int)(screenHeight / constants::TILE_SIZE));
+
+  for (int x = 0; x < testStage.width; x++) {
+    for (int y = 0; y < testStage.height; y++) {
+      auto r = new Rect(x * constants::TILE_SIZE, y * constants::TILE_SIZE, constants::TILE_SIZE,
+                        constants::TILE_SIZE);
+      tileRects.push_back(r);
+    }
   }
 }
 
@@ -16,6 +28,11 @@ GameEngine::~GameEngine() {
 }
 
 void GameEngine::start() {
+  printf("Generating Map..\n");
+  dungeonGen.generate();
+  printf("Map generated..\nApplying textures...\n");
+  tileRender.applyTextures(&testStage);
+
   while (running) {
     handleEvents();
     update();
@@ -29,20 +46,13 @@ void GameEngine::handleEvents() {
     case SDL_QUIT:
       running = false;
       break;
-    case SDL_KEYDOWN:
-      switch (evt.key.keysym.sym) {
-      case SDLK_w:
-        testAnimatedSprite.setFacing(Facing::UP);
-        break;
-      case SDLK_a:
-        testAnimatedSprite.setFacing(Facing::LEFT);
-        break;
-      case SDLK_s:
-        testAnimatedSprite.setFacing(Facing::DOWN);
-        break;
-      case SDLK_d:
-        testAnimatedSprite.setFacing(Facing::RIGHT);
-        break;
+    case SDL_MOUSEBUTTONDOWN:
+      auto mousePos = Vec(evt.motion.x, evt.motion.y);
+      for (auto rect : tileRects) {
+        if (rect->contains(mousePos)) {
+          testStage[Vec(rect->x / constants::TILE_SIZE, rect->y / constants::TILE_SIZE)]
+              ->printTileInfo();
+        }
       }
     }
   }
@@ -52,7 +62,11 @@ void GameEngine::update() {}
 
 void GameEngine::render() {
   SDL_RenderClear(renderer);
-  testAnimatedSprite.drawAt(renderer, 4, 4);
-  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+  tileRender.drawStageTo(renderer, &testStage);
+  SDL_SetRenderDrawColor(renderer, 255, 219, 209, 255);
+  for (auto rect : dungeonGen.rooms) {
+    rect->scale(constants::TILE_SIZE, constants::TILE_SIZE).draw(renderer);
+  }
+  SDL_SetRenderDrawColor(renderer, 51, 51, 51, 255);
   SDL_RenderPresent(renderer);
 }
